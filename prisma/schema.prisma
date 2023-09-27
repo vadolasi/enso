@@ -12,7 +12,7 @@ generator pothos {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -25,9 +25,28 @@ model User {
   assasId          String?
   roleId           String   @default("user")
   role             UserRole @relation(fields: [roleId], references: [id])
+  responses        Response[]
 }
 
 model UserRole {
   id    String @id
   users User[]
+}
+
+model Area {
+  id Int @id @default(autoincrement())
+}
+
+model Question {
+  id        Int @id @default(autoincrement())
+  enunciado String
+  responses Response[]
+}
+
+model Response {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userid], references: [id])
+  userid     Int
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId Int
 }

@@ -1,0 +1,15 @@
+type Query {
+  me: User!
+  questions: [Question!]!
+  users: [User!]!
+}
+
+type Question {
+  enunciado: String!
+  id: ID!
+}
+
+type User {
+  email: String!
+  id: ID!
+}

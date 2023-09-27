@@ -19,20 +19,30 @@ const User = builder.prismaObject("User", {
   })
 })
 
+const Question = builder.prismaObject("Question", {
+  fields: (t) => ({
+    id: t.exposeID("id"),
+    enunciado: t.exposeString("enunciado")
+  })
+})
+
 builder.queryType({
   fields: t => ({
-    hello: t.string({
-      resolve: () => "world"
-    }),
     users: t.field({
       type: [User],
-      resolve: async () => prisma.user.findMany({})
+      resolve: async () => prisma.user.findMany()
     }),
     me: t.field({
       type: User,
       resolve: async () => prisma.user.findUniqueOrThrow()
+    }),
+    questions: t.field({
+      type: [Question],
+      resolve: async () => prisma.question.findMany()
     })
   })
 })
 
-export const schema = builder.toSchema()
+const schema = builder.toSchema()
+
+export default schema
