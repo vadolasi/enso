@@ -22,6 +22,7 @@ const Page: NextPage = () => {
     handleSubmit,
     formState: { errors }
   } = useForm<FormData>({
+    // @ts-ignore
     resolver: yupResolver(schema),
     mode: "onBlur"
   })
