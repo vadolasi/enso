@@ -3,7 +3,7 @@ FROM node:18
 WORKDIR /usr/src/app
 
 COPY package.json pnpm-lock.yaml ./
-RUN npm i -g pnpm node-gyp && pnpm i --ignore-scripts
+RUN npm i -g pnpm node-gyp sharp && pnpm i --ignore-scripts
 COPY . .
 RUN pnpm exec prisma generate && pnpm build
 ENV NODE_ENV production

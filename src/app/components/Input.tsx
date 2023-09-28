@@ -8,7 +8,7 @@ type Props = React.HTMLProps<HTMLInputElement> & {
   error?: FieldError
 }
 
-export default React.forwardRef<HTMLInputElement, Props>(({ label, className, error, ...props }, ref) => {
+const Navbar = React.forwardRef<HTMLInputElement, Props>(({ label, className, error, ...props }, ref) => {
   return (
     <div className="form-control w-full">
       <label className="label">
@@ -23,3 +23,5 @@ export default React.forwardRef<HTMLInputElement, Props>(({ label, className, er
     </div>
   )
 })
+
+export default Navbar
