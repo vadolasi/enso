@@ -1,11 +1,11 @@
 import { createYoga } from "graphql-yoga"
 import schema from "./schema"
-import { useGraphQlJit } from "@envelop/graphql-jit"
+import { useGraphQlJit as GraphQLJit } from "@envelop/graphql-jit"
 import { renderGraphiQL } from "@graphql-yoga/render-graphiql"
-import { useResponseCache } from "@graphql-yoga/plugin-response-cache"
+import { useResponseCache as ResponseCache } from "@graphql-yoga/plugin-response-cache"
 import { createRedisCache } from "@envelop/response-cache-redis"
-import { useAPQ } from "@graphql-yoga/plugin-apq"
-import { useRateLimiter } from "@envelop/rate-limiter"
+import { useAPQ as APQ } from "@graphql-yoga/plugin-apq"
+import { useRateLimiter as RateLimiter } from "@envelop/rate-limiter"
 import Redis from "ioredis"
 import { writeFileSync } from "fs"
 import { printSchema } from "graphql"
@@ -21,14 +21,14 @@ const { handleRequest } = createYoga({
   graphqlEndpoint: "/api/graphql",
   batching: true,
   plugins: [
-    useGraphQlJit(),
-    useResponseCache({
+    GraphQLJit(),
+    ResponseCache({
       session: () => null,
       // @ts-ignore
       cache
     }),
-    useAPQ({ store: redis }),
-    useRateLimiter({ identifyFn: ctx => "id" })
+    APQ({ store: redis }),
+    RateLimiter({ identifyFn: ctx => "id" })
   ],
   renderGraphiQL,
   fetchAPI: { Response }
