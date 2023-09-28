@@ -24,4 +24,6 @@ const Navbar = React.forwardRef<HTMLInputElement, Props>(({ label, className, er
   )
 })
 
+Navbar.displayName = "Input"
+
 export default Navbar

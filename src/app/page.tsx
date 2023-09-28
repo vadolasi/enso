@@ -6,7 +6,7 @@ import steps from "./images/steps.svg"
 import Navbar from "./components/Navbar"
 import Link from "next/link"
 
-export default function () {
+const Page = () => {
   return (
     <>
       <Navbar />
@@ -57,3 +57,5 @@ export default function () {
     </>
   )
 }
+
+export default Page
