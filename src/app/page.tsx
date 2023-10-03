@@ -25,7 +25,7 @@ const Page = () => {
         <section className="hero min-h-[50vh] bg-primary text-white">
           <div className="hero-content flex-col lg:flex-row-reverse gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold">Moltado para você!</h1>
+              <h1 className="text-4xl md:text-5xl font-bold">Moldado para você!</h1>
               <p className="py-6">Nosso sistema inteligente se adapta ao seu nível de conhecimento, fornecendo questões sob medida que desafiam e elevam suas habilidades continuamente.</p>
             </div>
             <Image src={learning} className="md:max-w-sm lg:max-w-lg mr-12" alt="" />

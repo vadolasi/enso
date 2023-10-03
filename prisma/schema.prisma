@@ -4,11 +4,12 @@ generator client {
 
 generator kysely {
   provider = "prisma-kysely"
-  output = "../src/app/api/graphql/database"
+  output   = "../src/app/api/graphql/database"
 }
 
 generator pothos {
-  provider = "prisma-pothos-types"
+  provider    = "prisma-pothos-types"
+  prismaUtils = true
 }
 
 datasource db {
@@ -16,37 +17,123 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id               Int      @id @default(autoincrement())
-  name             String
-  email            String   @unique
-  emailConfirmated Boolean  @default(false)
-  password         String?
-  assasId          String?
-  roleId           String   @default("user")
-  role             UserRole @relation(fields: [roleId], references: [id])
-  responses        Response[]
+enum Cargo {
+  ADMINISTRADOR
+  USUARIO
 }
 
-model UserRole {
-  id    String @id
-  users User[]
+model Account {
+  id                 String    @id @default(cuid())
+  providerType       String
+  providerId         String
+  providerAccountId  String
+  refreshToken       String?
+  accessToken        String?
+  accessTokenExpires DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation(fields: [userId], references: [id])
+  userId             Int
+
+  @@unique([providerId, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  expires      DateTime
+  sessionToken String   @unique
+  accessToken  String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
+}
+
+model User {
+  id                 Int     @id @default(autoincrement())
+  imagem             String?
+  nome               String
+  email              String  @unique
+  emailConfirmado    Boolean @default(false)
+  senha              String?
+  assasId            String?
+  cargo              Cargo   @default(USUARIO)
+  respostasObjetivas RespostaObjetiva[]
+  comentarios        Comentario[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  accounts           Account[]
+  sessions           Session[]
+}
+
+model VerificationRequest {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, token])
 }
 
 model Area {
-  id Int @id @default(autoincrement())
+  id            Int @id @default(autoincrement())
+  nome          String
+  casosClinicos Area_CasoClinico[]
 }
 
-model Question {
-  id        Int @id @default(autoincrement())
-  enunciado String
-  responses Response[]
+model Area_CasoClinico {
+  id            Int         @id @default(autoincrement())
+  area          Area        @relation(fields: [areaId], references: [id])
+  areaId        Int
+  casoClinico   CasoClinico @relation(fields: [casoClinicoId], references: [id])
+  casoClinicoId Int
 }
 
-model Response {
-  id         Int      @id @default(autoincrement())
-  user       User     @relation(fields: [userid], references: [id])
-  userid     Int
-  question   Question @relation(fields: [questionId], references: [id])
-  questionId Int
+model CasoClinico {
+  id                Int @id @default(autoincrement())
+  questoesObjetivas QuestaoObjetiva[]
+  areas             Area_CasoClinico[]
+}
+
+model QuestaoObjetiva {
+  id            Int         @id @default(autoincrement())
+  enunciado     String
+  responses     RespostaObjetiva[]
+  casoClinico   CasoClinico @relation(fields: [casoClinicoId], references: [id])
+  casoClinicoId Int
+  comentarios   Comentario[]
+  alternativas  Alternativa[]
+}
+
+model Alternativa {
+  id          Int            @id @default(autoincrement())
+  enunciado   String
+  correta     Boolean         @default(false)
+  questao     QuestaoObjetiva @relation(fields: [questaoId], references: [id])
+  questaoId   Int
+  respostas   RespostaObjetiva[]
+}
+
+model RespostaObjetiva {
+  id            Int             @id @default(autoincrement())
+  usuario       User         @relation(fields: [usuarioId], references: [id])
+  usuarioId     Int
+  questao       QuestaoObjetiva @relation(fields: [questaoId], references: [id])
+  questaoId     Int
+  alternativa   Alternativa     @relation(fields: [alternativaId], references: [id])
+  alternativaId Int
+  correto       Boolean         @default(false)
+}
+
+model Comentario {
+  id            Int             @id @default(autoincrement())
+  usuario       User         @relation(fields: [usuarioId], references: [id])
+  usuarioId     Int
+  questao       QuestaoObjetiva @relation(fields: [questaoId], references: [id])
+  questaoId     Int
+  comentario    String
+  dataCriacao   DateTime        @default(now())
+  dataAtualizao DateTime        @updatedAt
 }

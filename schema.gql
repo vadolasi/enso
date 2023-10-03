@@ -1,15 +1,29 @@
-type Query {
-  me: User!
-  questions: [Question!]!
-  users: [User!]!
+enum Cargo {
+  ADMINISTRADOR
+  USUARIO
 }
 
-type Question {
+type LoginResult {
+  token: String!
+  user: User!
+}
+
+type Mutation {
+  login(email: String!, password: String!): LoginResult!
+}
+
+type Query {
+  question(id: Int!): QuestaoObjetiva!
+}
+
+type QuestaoObjetiva {
   enunciado: String!
   id: ID!
 }
 
 type User {
+  cargo: Cargo!
   email: String!
   id: ID!
+  nome: String!
 }

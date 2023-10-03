@@ -4,34 +4,100 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   : ColumnType<T, T | undefined, T>;
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-export type Area = {
-    id: Generated<number>;
+export const Cargo = {
+    ADMINISTRADOR: "ADMINISTRADOR",
+    USUARIO: "USUARIO"
+} as const;
+export type Cargo = (typeof Cargo)[keyof typeof Cargo];
+export type Account = {
+    id: string;
+    providerType: string;
+    providerId: string;
+    providerAccountId: string;
+    refreshToken: string | null;
+    accessToken: string | null;
+    accessTokenExpires: Timestamp | null;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Timestamp;
+    userId: number;
 };
-export type Question = {
+export type Alternativa = {
     id: Generated<number>;
     enunciado: string;
+    correta: Generated<boolean>;
+    questaoId: number;
 };
-export type Response = {
+export type Area = {
     id: Generated<number>;
-    userid: number;
-    questionId: number;
+    nome: string;
+};
+export type Area_CasoClinico = {
+    id: Generated<number>;
+    areaId: number;
+    casoClinicoId: number;
+};
+export type CasoClinico = {
+    id: Generated<number>;
+};
+export type Comentario = {
+    id: Generated<number>;
+    usuarioId: number;
+    questaoId: number;
+    comentario: string;
+    dataCriacao: Generated<Timestamp>;
+    dataAtualizao: Timestamp;
+};
+export type QuestaoObjetiva = {
+    id: Generated<number>;
+    enunciado: string;
+    casoClinicoId: number;
+};
+export type RespostaObjetiva = {
+    id: Generated<number>;
+    usuarioId: number;
+    questaoId: number;
+    alternativaId: number;
+    correto: Generated<boolean>;
+};
+export type Session = {
+    id: string;
+    expires: Timestamp;
+    sessionToken: string;
+    accessToken: string;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Timestamp;
+    userId: number;
 };
 export type User = {
     id: Generated<number>;
-    name: string;
+    imagem: string | null;
+    nome: string;
     email: string;
-    emailConfirmated: Generated<boolean>;
-    password: string | null;
+    emailConfirmado: Generated<boolean>;
+    senha: string | null;
     assasId: string | null;
-    roleId: Generated<string>;
+    cargo: Generated<Cargo>;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Timestamp;
 };
-export type UserRole = {
+export type VerificationRequest = {
     id: string;
+    identifier: string;
+    token: string;
+    expires: Timestamp;
+    createdAt: Generated<Timestamp>;
+    updatedAt: Timestamp;
 };
 export type DB = {
+    Account: Account;
+    Alternativa: Alternativa;
     Area: Area;
-    Question: Question;
-    Response: Response;
+    Area_CasoClinico: Area_CasoClinico;
+    CasoClinico: CasoClinico;
+    Comentario: Comentario;
+    QuestaoObjetiva: QuestaoObjetiva;
+    RespostaObjetiva: RespostaObjetiva;
+    Session: Session;
     User: User;
-    UserRole: UserRole;
+    VerificationRequest: VerificationRequest;
 };

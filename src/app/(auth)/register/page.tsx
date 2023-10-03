@@ -1,7 +1,7 @@
 "use client"
 
 import type { NextPage } from "next"
-import Input from "../../components/Input"
+import Input from "@/app/components/Input"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"

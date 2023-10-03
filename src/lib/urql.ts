@@ -1,12 +1,16 @@
-import { cacheExchange, createClient, fetchExchange } from "@urql/core"
+import { Exchange, cacheExchange, createClient, fetchExchange } from "@urql/core"
 import { persistedExchange } from "@urql/exchange-persisted"
 import { registerUrql } from "@urql/next/rsc"
+import { authExchange } from "@urql/exchange-auth"
+import { getServerSession } from "next-auth/next"
+import { authOptions } from "./authOptions"
 
-const makeClient = () => {
+export const makeClient = (extraExchanges: Exchange[] = []) => {
   return createClient({
     url: "http://localhost:3000/api/graphql",
     exchanges: [
       cacheExchange,
+      ...extraExchanges,
       persistedExchange({
         preferGetForPersistedQueries: true
       }),
@@ -15,6 +19,25 @@ const makeClient = () => {
   })
 }
 
-const { getClient } = registerUrql(makeClient)
+const authClientGenerator = async () => {
+  const session = await getServerSession(authOptions)
 
-export default getClient
+  return () => makeClient([
+    authExchange(async utils => ({
+      addAuthToOperation(operation) {
+        if (!session) return operation
+
+        return utils.appendHeaders(operation, {
+          // @ts-ignore
+          Authorization: `Bearer ${session.user.apiToken}`
+        })
+      },
+      didAuthError(error) {
+        return error.graphQLErrors.some(e => e.extensions?.code === "FORBIDDEN")
+      },
+      refreshAuth: async () => {}
+    }))
+  ])
+}
+
+export const getClient = async () => registerUrql(await authClientGenerator()).getClient()
