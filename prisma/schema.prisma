@@ -59,7 +59,7 @@ model User {
   assasId            String?
   cargo              Cargo   @default(USUARIO)
   respostasObjetivas RespostaObjetiva[]
-  comentarios        Comentario[]
+  postagensForu      PostagemForum[]
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
   accounts           Account[]
@@ -93,22 +93,23 @@ model Area_CasoClinico {
 
 model CasoClinico {
   id                Int @id @default(autoincrement())
+  enunciado         String
   questoesObjetivas QuestaoObjetiva[]
   areas             Area_CasoClinico[]
 }
 
 model QuestaoObjetiva {
-  id            Int         @id @default(autoincrement())
-  enunciado     String
-  responses     RespostaObjetiva[]
-  casoClinico   CasoClinico @relation(fields: [casoClinicoId], references: [id])
-  casoClinicoId Int
-  comentarios   Comentario[]
-  alternativas  Alternativa[]
+  id             Int         @id @default(autoincrement())
+  enunciado      String
+  responses      RespostaObjetiva[]
+  casoClinico    CasoClinico @relation(fields: [casoClinicoId], references: [id])
+  casoClinicoId  Int
+  postagemsForum PostagemForum[]
+  alternativas   Alternativa[]
 }
 
 model Alternativa {
-  id          Int            @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   enunciado   String
   correta     Boolean         @default(false)
   questao     QuestaoObjetiva @relation(fields: [questaoId], references: [id])
@@ -118,7 +119,7 @@ model Alternativa {
 
 model RespostaObjetiva {
   id            Int             @id @default(autoincrement())
-  usuario       User         @relation(fields: [usuarioId], references: [id])
+  usuario       User            @relation(fields: [usuarioId], references: [id])
   usuarioId     Int
   questao       QuestaoObjetiva @relation(fields: [questaoId], references: [id])
   questaoId     Int
@@ -127,13 +128,16 @@ model RespostaObjetiva {
   correto       Boolean         @default(false)
 }
 
-model Comentario {
-  id            Int             @id @default(autoincrement())
-  usuario       User         @relation(fields: [usuarioId], references: [id])
+model PostagemForum {
+  id            Int              @id @default(autoincrement())
+  usuario       User             @relation(fields: [usuarioId], references: [id])
   usuarioId     Int
-  questao       QuestaoObjetiva @relation(fields: [questaoId], references: [id])
-  questaoId     Int
+  questao       QuestaoObjetiva? @relation(fields: [questaoId], references: [id])
+  questaoId     Int?
   comentario    String
-  dataCriacao   DateTime        @default(now())
-  dataAtualizao DateTime        @updatedAt
+  dataCriacao   DateTime         @default(now())
+  dataAtualizao DateTime         @updatedAt
+  replyTo       PostagemForum?   @relation("ReplyTo", fields: [replyToId], references: [id])
+  replyToId     Int?
+  replies       PostagemForum[]  @relation("ReplyTo")
 }

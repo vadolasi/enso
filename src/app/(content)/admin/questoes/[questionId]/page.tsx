@@ -1,10 +1,9 @@
 import { graphql } from "@/gql"
 import { getClient } from "@/lib/urql"
-import type { NextPage } from "next"
-import Questions from "./components/Questions"
+import { NextPage } from "next"
 
 const getQuestionQuery = graphql(/* GraphQL */`
-  query getQuestionForUser($questionId: Int!) {
+  query getQuestionForAdmin($questionId: Int!) {
     casoClinico(id: $questionId) {
       enunciado
       questoesObjetivas {
@@ -29,10 +28,7 @@ const Page: NextPage<{ params: { questionId: string} }> = async ({ params: { que
     <div>
       {error && <p>{error.message}</p>}
       {data && (
-        <div>
-          <div dangerouslySetInnerHTML={{ __html: data.casoClinico.enunciado }} />
-          <Questions questions={data.casoClinico.questoesObjetivas} />
-        </div>
+        <h1>d</h1>
       )}
     </div>
   )

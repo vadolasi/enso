@@ -16,67 +16,62 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
-export enum Cargo {
-  Administrador = 'ADMINISTRADOR',
-  Usuario = 'USUARIO'
-}
+export type Alternativa = {
+  __typename?: 'Alternativa';
+  correta: Scalars['Boolean']['output'];
+  enunciado: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+};
 
-export type LoginResult = {
-  __typename?: 'LoginResult';
-  token: Scalars['String']['output'];
-  user: User;
+export type CasoClinico = {
+  __typename?: 'CasoClinico';
+  enunciado: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  questoesObjetivas: Array<QuestaoObjetiva>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  login: LoginResult;
+  createCasoClinico: CasoClinico;
 };
 
 
-export type MutationLoginArgs = {
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
+export type MutationCreateCasoClinicoArgs = {
+  enunciado: Scalars['String']['input'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  question: QuestaoObjetiva;
+  casoClinico: CasoClinico;
+  casosClinicos: Array<CasoClinico>;
 };
 
 
-export type QueryQuestionArgs = {
+export type QueryCasoClinicoArgs = {
   id: Scalars['Int']['input'];
 };
 
 export type QuestaoObjetiva = {
   __typename?: 'QuestaoObjetiva';
+  alternativas: Array<Alternativa>;
   enunciado: Scalars['String']['output'];
   id: Scalars['ID']['output'];
 };
 
-export type User = {
-  __typename?: 'User';
-  cargo: Cargo;
-  email: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  nome: Scalars['String']['output'];
-};
-
-export type GetQuestionQueryVariables = Exact<{
+export type GetQuestionForAdminQueryVariables = Exact<{
   questionId: Scalars['Int']['input'];
 }>;
 
 
-export type GetQuestionQuery = { __typename?: 'Query', question: { __typename?: 'QuestaoObjetiva', id: string } };
+export type GetQuestionForAdminQuery = { __typename?: 'Query', casoClinico: { __typename?: 'CasoClinico', enunciado: string, questoesObjetivas: Array<{ __typename?: 'QuestaoObjetiva', id: string, enunciado: string, alternativas: Array<{ __typename?: 'Alternativa', id: string, enunciado: string, correta: boolean }> }> } };
 
-export type LoginMutationVariables = Exact<{
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
+export type GetQuestionForUserQueryVariables = Exact<{
+  questionId: Scalars['Int']['input'];
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResult', token: string, user: { __typename?: 'User', id: string, email: string, nome: string, cargo: Cargo } } };
+export type GetQuestionForUserQuery = { __typename?: 'Query', casoClinico: { __typename?: 'CasoClinico', enunciado: string, questoesObjetivas: Array<{ __typename?: 'QuestaoObjetiva', id: string, enunciado: string, alternativas: Array<{ __typename?: 'Alternativa', id: string, enunciado: string, correta: boolean }> }> } };
 
 
-export const GetQuestionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getQuestion"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questionId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"question"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questionId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<GetQuestionQuery, GetQuestionQueryVariables>;
-export const LoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Login"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"token"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"nome"}},{"kind":"Field","name":{"kind":"Name","value":"cargo"}}]}}]}}]}}]} as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
+export const GetQuestionForAdminDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getQuestionForAdmin"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questionId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"casoClinico"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questionId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enunciado"}},{"kind":"Field","name":{"kind":"Name","value":"questoesObjetivas"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"enunciado"}},{"kind":"Field","name":{"kind":"Name","value":"alternativas"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"enunciado"}},{"kind":"Field","name":{"kind":"Name","value":"correta"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetQuestionForAdminQuery, GetQuestionForAdminQueryVariables>;
+export const GetQuestionForUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getQuestionForUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questionId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"casoClinico"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questionId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enunciado"}},{"kind":"Field","name":{"kind":"Name","value":"questoesObjetivas"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"enunciado"}},{"kind":"Field","name":{"kind":"Name","value":"alternativas"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"enunciado"}},{"kind":"Field","name":{"kind":"Name","value":"correta"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetQuestionForUserQuery, GetQuestionForUserQueryVariables>;

@@ -3,8 +3,11 @@
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import clsx from "clsx"
+import { useSession } from "next-auth/react"
 
 const Navbar: React.FC = () => {
+  const { status } = useSession()
+
   const [navbar, setNavbar] = useState(false)
 
   const changeBackground = () => {
@@ -40,8 +43,16 @@ const Navbar: React.FC = () => {
           </label>
           <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
             {items()}
-            <li><Link className="border" href="/login">Entre</Link></li>
-            <li><a className="bg-primary text-white border border-primary">Cadastre-se</a></li>
+            {status === "authenticated" ? (
+              <>
+                <li><Link className="btn btn-sm" href="/home">Acessar plataforma</Link></li>
+              </>
+            ) : (
+              <>
+                <li><Link className="btn btn-sm btn-outline" href="/login">Entre</Link></li>
+                <li><a className="btn btn-sm btn-primary">Cadastre-se</a></li>
+              </>
+            )}
           </ul>
         </div>
         <a className="btn btn-ghost normal-case text-xl">Enso</a>
@@ -53,8 +64,16 @@ const Navbar: React.FC = () => {
       </div>
       <div className="navbar-end hidden lg:flex">
         <ul className="menu menu-horizontal px-1 flex gap-1">
-          <li><Link className="border" href="/login">Entre</Link></li>
-          <li><Link className="bg-primary text-white border border-primary" href="/register">Cadastre-se</Link></li>
+          {status === "authenticated" ? (
+            <>
+              <li><Link className="btn btn-sm btn-primary" href="/home">Acessar plataforma</Link></li>
+            </>
+          ) : (
+            <>
+              <li><Link className="border" href="/login">Entre</Link></li>
+              <li><a className="bg-primary text-white border border-primary">Cadastre-se</a></li>
+            </>
+          )}
         </ul>
       </div>
     </header>

@@ -13,8 +13,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query getQuestion($questionId: Int!) {\n    question(id: $questionId) {\n      id\n    }\n  }\n": types.GetQuestionDocument,
-    "\n  mutation Login($email: String!, $password: String!) {\n    login(email: $email, password: $password) {\n      token\n      user {\n        id\n        email\n        nome\n        cargo\n      }\n    }\n  }\n": types.LoginDocument,
+    "\n  query getQuestionForAdmin($questionId: Int!) {\n    casoClinico(id: $questionId) {\n      enunciado\n      questoesObjetivas {\n        id\n        enunciado\n        alternativas {\n          id\n          enunciado\n          correta\n        }\n      }\n    }\n  }\n": types.GetQuestionForAdminDocument,
+    "\n  query getQuestionForUser($questionId: Int!) {\n    casoClinico(id: $questionId) {\n      enunciado\n      questoesObjetivas {\n        id\n        enunciado\n        alternativas {\n          id\n          enunciado\n          correta\n        }\n      }\n    }\n  }\n": types.GetQuestionForUserDocument,
 };
 
 /**
@@ -34,11 +34,11 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query getQuestion($questionId: Int!) {\n    question(id: $questionId) {\n      id\n    }\n  }\n"): (typeof documents)["\n  query getQuestion($questionId: Int!) {\n    question(id: $questionId) {\n      id\n    }\n  }\n"];
+export function graphql(source: "\n  query getQuestionForAdmin($questionId: Int!) {\n    casoClinico(id: $questionId) {\n      enunciado\n      questoesObjetivas {\n        id\n        enunciado\n        alternativas {\n          id\n          enunciado\n          correta\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query getQuestionForAdmin($questionId: Int!) {\n    casoClinico(id: $questionId) {\n      enunciado\n      questoesObjetivas {\n        id\n        enunciado\n        alternativas {\n          id\n          enunciado\n          correta\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation Login($email: String!, $password: String!) {\n    login(email: $email, password: $password) {\n      token\n      user {\n        id\n        email\n        nome\n        cargo\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation Login($email: String!, $password: String!) {\n    login(email: $email, password: $password) {\n      token\n      user {\n        id\n        email\n        nome\n        cargo\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query getQuestionForUser($questionId: Int!) {\n    casoClinico(id: $questionId) {\n      enunciado\n      questoesObjetivas {\n        id\n        enunciado\n        alternativas {\n          id\n          enunciado\n          correta\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query getQuestionForUser($questionId: Int!) {\n    casoClinico(id: $questionId) {\n      enunciado\n      questoesObjetivas {\n        id\n        enunciado\n        alternativas {\n          id\n          enunciado\n          correta\n        }\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

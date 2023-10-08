@@ -1,24 +1,9 @@
-import { graphql } from "@/gql"
-import { makeClient } from "@/lib/urql"
-import NextAuth from "next-auth"
 import type { AuthOptions } from "next-auth"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 import prisma from "@/lib/prisma"
-
-const LoginMutation = graphql(/* GraphQL */`
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      token
-      user {
-        id
-        email
-        nome
-        cargo
-      }
-    }
-  }
-`)
+import { compare } from "bcryptjs"
+import jwt from "jsonwebtoken"
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -30,16 +15,28 @@ export const authOptions: AuthOptions = {
       },
       async authorize (credentials) {
         if (credentials) {
-          const client = makeClient()
           const { email, password } = credentials
-          const { data, error } = await client.mutation(LoginMutation, { email, password }).toPromise()
+          const user = await prisma.user.findUnique({ where: { email } })
 
-          if (error) {
+          if (!user) {
             return null
-          } else {
-            const { login: { token, user: { email, id, nome, cargo } } } = data!
-            return { email, id, apiToken: token, name: nome, cargo }
           }
+
+          const valid = await compare(password, user.senha!)
+
+          if (!valid) {
+            return null
+          }
+
+          const token = jwt.sign(
+            { sub: user.id },
+            process.env.JWT_SECRET!,
+            {
+              expiresIn: "7d"
+            }
+          )
+
+          return { apiToken: token, id: user.id.toString(), email: user.email, name: user.nome, cargo: user.cargo }
         } else {
           return null
         }

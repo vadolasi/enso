@@ -1,14 +1,13 @@
-import { authOptions } from "@/lib/authOptions"
-import { getServerSession } from "next-auth"
-import { signOut } from "next-auth/react"
 import Link from "next/link"
 import React from "react"
 import logo from "./logo.png"
 import Image from "next/image"
 import Profile from "./components/Profile"
+import useAuth from "@/lib/useAuth"
+import SidebarLinks from "../components/SidebarLinks"
 
 const Layout: React.FC<{ children: React.ReactNode }> = async ({ children }) => {
-  const session = await getServerSession(authOptions)
+  const { name, cargo } = await useAuth()
 
   return (
     <div className="drawer lg:drawer-open">
@@ -21,12 +20,12 @@ const Layout: React.FC<{ children: React.ReactNode }> = async ({ children }) => 
             </Link>
           </div>
           <div className="navbar-end">
-            <Profile name={(session?.user as any)?.name} />
+            <Profile name={name!} className="hidden lg:block" />
+            <label htmlFor="drawer" className="btn btn-primary drawer-button lg:hidden">Open drawer</label>
           </div>
         </div>
-        <main className="flex items-center justify-center flex-1 h-full overflow-y-auto">
+        <main className="flex flex-col items-center justify-center flex-1 h-full overflow-y-auto p-20">
           {children}
-          <label htmlFor="drawer" className="btn btn-primary drawer-button lg:hidden">Open drawer</label>
         </main>
       </div>
       <div className="drawer-side flex flex-col overflow-hidden">
@@ -37,22 +36,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = async ({ children }) => 
           </Link>
         </div>
         <div className="bg-base-100 border-r h-full flex-1">
-          <ul className="menu p-4 w-80 min-h-full text-base-content">
-            <li>
-              <Link href="/home">Home</Link>
-            </li>
-            <li>
-              <Link href="/">Questões</Link>
-            </li>
-            <li>
-              <Link href="/desempenho">Desempenho</Link>
-            </li>
-            {(session?.user as any)?.cargo === "ADMINISTRADOR" && (
-              <li>
-                <Link href="/admin">Admin</Link>
-              </li>
-            )}
-          </ul>
+          <Profile name={name!} className="lg:hidden" />
+          <SidebarLinks cargo={cargo!} />
         </div>
       </div>
     </div>

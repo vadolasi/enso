@@ -38,14 +38,16 @@ export type Area_CasoClinico = {
 };
 export type CasoClinico = {
     id: Generated<number>;
+    enunciado: string;
 };
-export type Comentario = {
+export type PostagemForum = {
     id: Generated<number>;
     usuarioId: number;
-    questaoId: number;
+    questaoId: number | null;
     comentario: string;
     dataCriacao: Generated<Timestamp>;
     dataAtualizao: Timestamp;
+    replyToId: number | null;
 };
 export type QuestaoObjetiva = {
     id: Generated<number>;
@@ -94,7 +96,7 @@ export type DB = {
     Area: Area;
     Area_CasoClinico: Area_CasoClinico;
     CasoClinico: CasoClinico;
-    Comentario: Comentario;
+    PostagemForum: PostagemForum;
     QuestaoObjetiva: QuestaoObjetiva;
     RespostaObjetiva: RespostaObjetiva;
     Session: Session;

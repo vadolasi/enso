@@ -4,6 +4,7 @@ import { registerUrql } from "@urql/next/rsc"
 import { authExchange } from "@urql/exchange-auth"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "./authOptions"
+import useAuth from "./useAuth"
 
 export const makeClient = (extraExchanges: Exchange[] = []) => {
   return createClient({
@@ -20,16 +21,15 @@ export const makeClient = (extraExchanges: Exchange[] = []) => {
 }
 
 const authClientGenerator = async () => {
-  const session = await getServerSession(authOptions)
+  const { isLoggedIn, apiToken } = await useAuth()
 
   return () => makeClient([
     authExchange(async utils => ({
       addAuthToOperation(operation) {
-        if (!session) return operation
+        if (!isLoggedIn) return operation
 
         return utils.appendHeaders(operation, {
-          // @ts-ignore
-          Authorization: `Bearer ${session.user.apiToken}`
+          Authorization: `Bearer ${apiToken}`
         })
       },
       didAuthError(error) {
