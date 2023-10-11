@@ -5,12 +5,15 @@ import { SessionProvider } from "next-auth/react"
 import React from "react"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import ClientProvider from "./clientProvider"
 
 const Providers: React.FC<{ children: React.ReactNode, session: Session | null }> = ({ children, session }) => {
   return (
     <SessionProvider session={session}>
-      {children}
-      <ToastContainer />
+      <ClientProvider>
+        {children}
+        <ToastContainer />
+      </ClientProvider>
     </SessionProvider>
   )
 }

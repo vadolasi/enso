@@ -7,7 +7,7 @@ const getQuestionQuery = graphql(/* GraphQL */`
   query getQuestionForUser($questionId: Int!) {
     casoClinico(id: $questionId) {
       enunciado
-      questoesObjetivas {
+      questoes {
         id
         enunciado
         alternativas {
@@ -26,12 +26,12 @@ const Page: NextPage<{ params: { questionId: string} }> = async ({ params: { que
   const { data, error } = await client.query(getQuestionQuery, { questionId: parseInt(questionId) })
 
   return (
-    <div>
+    <div className="w-full">
       {error && <p>{error.message}</p>}
       {data && (
-        <div>
-          <div dangerouslySetInnerHTML={{ __html: data.casoClinico.enunciado }} />
-          <Questions questions={data.casoClinico.questoesObjetivas} />
+        <div className="w-full">
+          <div dangerouslySetInnerHTML={{ __html: data.casoClinico.enunciado }} className="prose prose-sm lg:prose-md xl:prose-lg" />
+          <Questions questions={data.casoClinico.questoes} />
         </div>
       )}
     </div>

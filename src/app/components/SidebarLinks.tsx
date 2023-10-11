@@ -28,7 +28,7 @@ const SidebarLinks: React.FC<{ cargo: string }> = ({ cargo }) => {
           <li>
             <Link href="/desempenho">Desempenho</Link>
           </li>
-          {cargo === "ADMINISTRADOR" && (
+          {cargo.includes("ADMINISTRADOR") && (
             <li>
               <Link href="/admin">Admin</Link>
             </li>

@@ -37,7 +37,7 @@ const builder = new SchemaBuilder<{
   },
   authScopes: async (context) => ({
     loggedIn: !!context.currentUser,
-    admin: () =>  context.currentUser?.cargo === Cargo.ADMINISTRADOR
+    admin: ([Cargo.ADMINISTRADOR, Cargo.ADMINISTRADOR_MESTRE] as Cargo[]).includes(context.currentUser.cargo)
   }),
   scopeAuthOptions: {
     authorizeOnSubscribe: true

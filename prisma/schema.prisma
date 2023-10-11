@@ -18,8 +18,26 @@ datasource db {
 }
 
 enum Cargo {
+  ADMINISTRADOR_MESTRE
   ADMINISTRADOR
+  MODERADOR
   USUARIO
+}
+
+enum TipoTicket {
+  DUVIDA
+  ERRO
+  SUGESTAO
+}
+
+enum TipoQuestao {
+  OBJETIVA
+  DISCURSIVA
+}
+
+enum TipoVoto {
+  POSITIVO
+  NEGATIVO
 }
 
 model Account {
@@ -50,20 +68,26 @@ model Session {
 }
 
 model User {
-  id                 Int     @id @default(autoincrement())
-  imagem             String?
-  nome               String
-  email              String  @unique
-  emailConfirmado    Boolean @default(false)
-  senha              String?
-  assasId            String?
-  cargo              Cargo   @default(USUARIO)
-  respostasObjetivas RespostaObjetiva[]
-  postagensForu      PostagemForum[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  accounts           Account[]
-  sessions           Session[]
+  id                Int               @id @default(autoincrement())
+  imagem            String?
+  nome              String
+  email             String            @unique
+  emailConfirmado   Boolean           @default(false)
+  senha             String?
+  assasId           String?
+  cargo             Cargo             @default(USUARIO)
+  respostas         Resposta[]
+  postagensForum    PostagemForum[]
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  accounts          Account[]
+  sessions          Session[]
+  tickets           Ticket[]
+  denuciasFeitas    Denucia[]         @relation("DenunciaFeita")
+  denuciasRecebidas Denucia[]         @relation("DenunciaRecebida")
+  simulados         Simulado[]
+  cadernosQuestoes  CadernoQuestoes[]
+  votosPostagem     VotoPostagem[]
 }
 
 model VerificationRequest {
@@ -78,9 +102,18 @@ model VerificationRequest {
 }
 
 model Area {
-  id            Int @id @default(autoincrement())
+  id            Int                @id @default(autoincrement())
   nome          String
   casosClinicos Area_CasoClinico[]
+  subAreas      SubArea[]
+}
+
+model SubArea {
+  id            Int                   @id @default(autoincrement())
+  nome          String
+  area          Area                  @relation(fields: [areaId], references: [id])
+  areaId        Int
+  casosClinicos CasoClinico_SubArea[]
 }
 
 model Area_CasoClinico {
@@ -91,53 +124,156 @@ model Area_CasoClinico {
   casoClinicoId Int
 }
 
-model CasoClinico {
-  id                Int @id @default(autoincrement())
-  enunciado         String
-  questoesObjetivas QuestaoObjetiva[]
-  areas             Area_CasoClinico[]
+model CasoClinico_SubArea {
+  id            Int         @id @default(autoincrement())
+  casoClinico   CasoClinico @relation(fields: [casoClinicoId], references: [id])
+  casoClinicoId Int
+  subArea       SubArea     @relation(fields: [subAreaId], references: [id])
+  subAreaId     Int
 }
 
-model QuestaoObjetiva {
-  id             Int         @id @default(autoincrement())
+model CasoClinico {
+  id             Int                   @id @default(autoincrement())
   enunciado      String
-  responses      RespostaObjetiva[]
-  casoClinico    CasoClinico @relation(fields: [casoClinicoId], references: [id])
-  casoClinicoId  Int
-  postagemsForum PostagemForum[]
-  alternativas   Alternativa[]
+  enunciadoDelta String
+  questoes       Questao[]
+  areas          Area_CasoClinico[]
+  subAreas       CasoClinico_SubArea[]
+}
+
+model Questao {
+  id               Int                       @id @default(autoincrement())
+  enunciado        String
+  enunciadoDelta   String
+  responses        Resposta[]
+  casoClinico      CasoClinico               @relation(fields: [casoClinicoId], references: [id], onDelete: Cascade)
+  casoClinicoId    Int
+  postagemsForum   PostagemForum[]
+  alternativas     Alternativa[]
+  tickets          Ticket[]
+  simulados        Questao_Simulado[]
+  cadernosQuestoes Questao_CadernoQuestoes[]
+  tipo             TipoQuestao
 }
 
 model Alternativa {
-  id          Int             @id @default(autoincrement())
-  enunciado   String
-  correta     Boolean         @default(false)
-  questao     QuestaoObjetiva @relation(fields: [questaoId], references: [id])
-  questaoId   Int
-  respostas   RespostaObjetiva[]
+  id             Int        @id @default(autoincrement())
+  enunciado      String
+  enunciadoDelta String
+  correta        Boolean    @default(false)
+  questao        Questao    @relation(fields: [questaoId], references: [id], onDelete: Cascade)
+  questaoId      Int
+  respostas      Resposta[]
 }
 
-model RespostaObjetiva {
-  id            Int             @id @default(autoincrement())
-  usuario       User            @relation(fields: [usuarioId], references: [id])
+model Resposta {
+  id            Int         @id @default(autoincrement())
+  usuario       User        @relation(fields: [usuarioId], references: [id])
   usuarioId     Int
-  questao       QuestaoObjetiva @relation(fields: [questaoId], references: [id])
-  questaoId     Int
-  alternativa   Alternativa     @relation(fields: [alternativaId], references: [id])
+  questao       Questao?    @relation(fields: [questaoId], references: [id], onDelete: Cascade)
+  questaoId     Int?
+  alternativa   Alternativa @relation(fields: [alternativaId], references: [id], onDelete: Cascade)
   alternativaId Int
-  correto       Boolean         @default(false)
+  correto       Boolean     @default(false)
+  dataCriacao   DateTime    @default(now())
+  tipo          TipoQuestao
+  resposta      String?
 }
 
 model PostagemForum {
-  id            Int              @id @default(autoincrement())
-  usuario       User             @relation(fields: [usuarioId], references: [id])
+  id             Int             @id @default(autoincrement())
+  usuario        User            @relation(fields: [usuarioId], references: [id])
+  usuarioId      Int
+  questao        Questao?        @relation(fields: [questaoId], references: [id])
+  questaoId      Int?
+  comentario     String
+  dataCriacao    DateTime        @default(now())
+  dataAtualizao  DateTime        @updatedAt
+  respostaPara   PostagemForum?  @relation("RespostaPara", fields: [respostaParaId], references: [id])
+  respostaParaId Int?
+  respostas      PostagemForum[] @relation("RespostaPara")
+  denucias       Denucia[]
+  votos          VotoPostagem[]
+}
+
+model VotoPostagem {
+  id            Int           @id @default(autoincrement())
+  usuario       User          @relation(fields: [usuarioId], references: [id])
   usuarioId     Int
-  questao       QuestaoObjetiva? @relation(fields: [questaoId], references: [id])
-  questaoId     Int?
-  comentario    String
-  dataCriacao   DateTime         @default(now())
-  dataAtualizao DateTime         @updatedAt
-  replyTo       PostagemForum?   @relation("ReplyTo", fields: [replyToId], references: [id])
-  replyToId     Int?
-  replies       PostagemForum[]  @relation("ReplyTo")
+  postagem      PostagemForum @relation(fields: [postagemId], references: [id])
+  postagemId    Int
+  dataCriacao   DateTime      @default(now())
+  dataAtualizao DateTime      @updatedAt
+  tipo          TipoVoto
+}
+
+model Ticket {
+  id          Int          @id @default(autoincrement())
+  usuario     User         @relation(fields: [usuarioId], references: [id])
+  usuarioId   Int
+  questao     Questao?     @relation(fields: [questaoId], references: [id])
+  questaoId   Int?
+  comentario  String
+  dataCriacao DateTime     @default(now())
+  recorrecoes Recorrecao[]
+}
+
+model Denucia {
+  id                 Int            @id @default(autoincrement())
+  usuario            User           @relation("DenunciaFeita", fields: [usuarioId], references: [id])
+  usuarioId          Int
+  usuarioDenuciado   User           @relation("DenunciaRecebida", fields: [usuarioDenuciadoId], references: [id])
+  usuarioDenuciadoId Int
+  postagem           PostagemForum? @relation(fields: [postagemId], references: [id])
+  postagemId         Int?
+  comentario         String
+  dataCriacao        DateTime       @default(now())
+  dataAtualizao      DateTime       @updatedAt
+}
+
+model Questao_Simulado {
+  id            Int      @id @default(autoincrement())
+  questao       Questao  @relation(fields: [questaoId], references: [id])
+  questaoId     Int
+  simulado      Simulado @relation(fields: [simuladoId], references: [id])
+  simuladoId    Int
+  dataCriacao   DateTime @default(now())
+  dataAtualizao DateTime @updatedAt
+}
+
+model Simulado {
+  id            Int                @id @default(autoincrement())
+  usuario       User               @relation(fields: [usuarioId], references: [id])
+  usuarioId     Int
+  questoes      Questao_Simulado[]
+  dataCriacao   DateTime           @default(now())
+  dataAtualizao DateTime           @updatedAt
+}
+
+model Questao_CadernoQuestoes {
+  id                Int             @id @default(autoincrement())
+  questao           Questao         @relation(fields: [questaoId], references: [id])
+  questaoId         Int
+  cadernoQuestoes   CadernoQuestoes @relation(fields: [cadernoQuestoesId], references: [id])
+  cadernoQuestoesId Int
+  dataCriacao       DateTime        @default(now())
+  dataAtualizao     DateTime        @updatedAt
+}
+
+model CadernoQuestoes {
+  id            Int                       @id @default(autoincrement())
+  usuario       User                      @relation(fields: [usuarioId], references: [id])
+  usuarioId     Int
+  questoes      Questao_CadernoQuestoes[]
+  dataCriacao   DateTime                  @default(now())
+  dataAtualizao DateTime                  @updatedAt
+}
+
+model Recorrecao {
+  id          Int      @id @default(autoincrement())
+  ticket      Ticket   @relation(fields: [ticketId], references: [id])
+  ticketId    Int
+  questaoId   Int?
+  comentario  String
+  dataCriacao DateTime @default(now())
 }

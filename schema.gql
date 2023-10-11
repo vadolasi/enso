@@ -7,11 +7,25 @@ type Alternativa {
 type CasoClinico {
   enunciado: String!
   id: ID!
-  questoesObjetivas: [QuestaoObjetiva!]!
+  questoes: [Questao!]!
+}
+
+input CreateAlternativaInput {
+  correta: Boolean!
+  enunciado: String!
+  enunciadoDelta: String!
+}
+
+input CreateQuestaoInput {
+  alternativas: [CreateAlternativaInput!]!
+  enunciado: String!
+  enunciadoDelta: String!
 }
 
 type Mutation {
-  createCasoClinico(enunciado: String!): CasoClinico!
+  createCasoClinico(enunciado: String!, enunciadoDelta: String!, questoes: [CreateQuestaoInput!]!): CasoClinico!
+  responderCasoClinico(id: Int!, respostas: [Int!]!): Resultado!
+  updateCasoClinico(data: UpdateCasoClinicoInput!, id: Int!): CasoClinico!
 }
 
 type Query {
@@ -19,8 +33,46 @@ type Query {
   casosClinicos: [CasoClinico!]!
 }
 
-type QuestaoObjetiva {
+type Questao {
   alternativas: [Alternativa!]!
   enunciado: String!
   id: ID!
+}
+
+type Resultado {
+  corretas: [Int!]!
+  total: Int!
+}
+
+input UpdateCasoClinicoInput {
+  enunciado: String
+  enunciadoDelta: String
+  questoes: UpdateCasoClinicoQuestaoInput
+}
+
+input UpdateCasoClinicoQuestao {
+  alternativas: UpdateCasoClinicoQuestaoAlternativaInput
+  enunciado: String
+  enunciadoDelta: String
+  id: Int!
+}
+
+input UpdateCasoClinicoQuestaoAlternativa {
+  correta: Boolean
+  enunciado: String
+  enunciadoDelta: String
+  id: Int!
+}
+
+input UpdateCasoClinicoQuestaoAlternativaInput {
+  create: [CreateAlternativaInput!]
+  delete: [ID!]
+  update: [UpdateCasoClinicoQuestaoAlternativa!]
+}
+
+input UpdateCasoClinicoQuestaoInput {
+  create: [CreateQuestaoInput!]
+  delete: [ID!]
+  id: Int!
+  update: [UpdateCasoClinicoQuestao!]
 }

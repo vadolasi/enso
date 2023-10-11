@@ -2,9 +2,8 @@ import { Exchange, cacheExchange, createClient, fetchExchange } from "@urql/core
 import { persistedExchange } from "@urql/exchange-persisted"
 import { registerUrql } from "@urql/next/rsc"
 import { authExchange } from "@urql/exchange-auth"
-import { getServerSession } from "next-auth/next"
-import { authOptions } from "./authOptions"
-import useAuth from "./useAuth"
+import useAuth, { useAuthClient } from "./useAuth"
+import { useSession } from "next-auth/react"
 
 export const makeClient = (extraExchanges: Exchange[] = []) => {
   return createClient({
@@ -20,10 +19,8 @@ export const makeClient = (extraExchanges: Exchange[] = []) => {
   })
 }
 
-const authClientGenerator = async () => {
-  const { isLoggedIn, apiToken } = await useAuth()
-
-  return () => makeClient([
+const _makeClientWithAuth = (isLoggedIn: boolean, apiToken: string) => {
+  return makeClient([
     authExchange(async utils => ({
       addAuthToOperation(operation) {
         if (!isLoggedIn) return operation
@@ -40,4 +37,17 @@ const authClientGenerator = async () => {
   ])
 }
 
-export const getClient = async () => registerUrql(await authClientGenerator()).getClient()
+export const makeClientWithAuth = () => {
+  const { isLoggedIn, apiToken } = useAuthClient()
+  console.log(isLoggedIn, apiToken)
+
+  return _makeClientWithAuth(isLoggedIn, apiToken!)
+}
+
+const getClientWithAuth = async () => {
+  const { isLoggedIn, apiToken } = await useAuth()
+
+  return () => _makeClientWithAuth(isLoggedIn, apiToken!)
+}
+
+export const getClient = async () => registerUrql(await getClientWithAuth()).getClient()

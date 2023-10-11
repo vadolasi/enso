@@ -6,7 +6,7 @@ const getQuestionQuery = graphql(/* GraphQL */`
   query getQuestionForAdmin($questionId: Int!) {
     casoClinico(id: $questionId) {
       enunciado
-      questoesObjetivas {
+      questoes {
         id
         enunciado
         alternativas {

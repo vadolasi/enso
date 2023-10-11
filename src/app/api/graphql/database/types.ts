@@ -5,10 +5,28 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export const Cargo = {
+    ADMINISTRADOR_MESTRE: "ADMINISTRADOR_MESTRE",
     ADMINISTRADOR: "ADMINISTRADOR",
+    MODERADOR: "MODERADOR",
     USUARIO: "USUARIO"
 } as const;
 export type Cargo = (typeof Cargo)[keyof typeof Cargo];
+export const TipoTicket = {
+    DUVIDA: "DUVIDA",
+    ERRO: "ERRO",
+    SUGESTAO: "SUGESTAO"
+} as const;
+export type TipoTicket = (typeof TipoTicket)[keyof typeof TipoTicket];
+export const TipoQuestao = {
+    OBJETIVA: "OBJETIVA",
+    DISCURSIVA: "DISCURSIVA"
+} as const;
+export type TipoQuestao = (typeof TipoQuestao)[keyof typeof TipoQuestao];
+export const TipoVoto = {
+    POSITIVO: "POSITIVO",
+    NEGATIVO: "NEGATIVO"
+} as const;
+export type TipoVoto = (typeof TipoVoto)[keyof typeof TipoVoto];
 export type Account = {
     id: string;
     providerType: string;
@@ -24,6 +42,7 @@ export type Account = {
 export type Alternativa = {
     id: Generated<number>;
     enunciado: string;
+    enunciadoDelta: string;
     correta: Generated<boolean>;
     questaoId: number;
 };
@@ -36,9 +55,30 @@ export type Area_CasoClinico = {
     areaId: number;
     casoClinicoId: number;
 };
+export type CadernoQuestoes = {
+    id: Generated<number>;
+    usuarioId: number;
+    dataCriacao: Generated<Timestamp>;
+    dataAtualizao: Timestamp;
+};
 export type CasoClinico = {
     id: Generated<number>;
     enunciado: string;
+    enunciadoDelta: string;
+};
+export type CasoClinico_SubArea = {
+    id: Generated<number>;
+    casoClinicoId: number;
+    subAreaId: number;
+};
+export type Denucia = {
+    id: Generated<number>;
+    usuarioId: number;
+    usuarioDenuciadoId: number;
+    postagemId: number | null;
+    comentario: string;
+    dataCriacao: Generated<Timestamp>;
+    dataAtualizao: Timestamp;
 };
 export type PostagemForum = {
     id: Generated<number>;
@@ -47,19 +87,45 @@ export type PostagemForum = {
     comentario: string;
     dataCriacao: Generated<Timestamp>;
     dataAtualizao: Timestamp;
-    replyToId: number | null;
+    respostaParaId: number | null;
 };
-export type QuestaoObjetiva = {
+export type Questao = {
     id: Generated<number>;
     enunciado: string;
+    enunciadoDelta: string;
     casoClinicoId: number;
+    tipo: TipoQuestao;
 };
-export type RespostaObjetiva = {
+export type Questao_CadernoQuestoes = {
+    id: Generated<number>;
+    questaoId: number;
+    cadernoQuestoesId: number;
+    dataCriacao: Generated<Timestamp>;
+    dataAtualizao: Timestamp;
+};
+export type Questao_Simulado = {
+    id: Generated<number>;
+    questaoId: number;
+    simuladoId: number;
+    dataCriacao: Generated<Timestamp>;
+    dataAtualizao: Timestamp;
+};
+export type Recorrecao = {
+    id: Generated<number>;
+    ticketId: number;
+    questaoId: number | null;
+    comentario: string;
+    dataCriacao: Generated<Timestamp>;
+};
+export type Resposta = {
     id: Generated<number>;
     usuarioId: number;
-    questaoId: number;
+    questaoId: number | null;
     alternativaId: number;
     correto: Generated<boolean>;
+    dataCriacao: Generated<Timestamp>;
+    tipo: TipoQuestao;
+    resposta: string | null;
 };
 export type Session = {
     id: string;
@@ -69,6 +135,24 @@ export type Session = {
     createdAt: Generated<Timestamp>;
     updatedAt: Timestamp;
     userId: number;
+};
+export type Simulado = {
+    id: Generated<number>;
+    usuarioId: number;
+    dataCriacao: Generated<Timestamp>;
+    dataAtualizao: Timestamp;
+};
+export type SubArea = {
+    id: Generated<number>;
+    nome: string;
+    areaId: number;
+};
+export type Ticket = {
+    id: Generated<number>;
+    usuarioId: number;
+    questaoId: number | null;
+    comentario: string;
+    dataCriacao: Generated<Timestamp>;
 };
 export type User = {
     id: Generated<number>;
@@ -90,16 +174,34 @@ export type VerificationRequest = {
     createdAt: Generated<Timestamp>;
     updatedAt: Timestamp;
 };
+export type VotoPostagem = {
+    id: Generated<number>;
+    usuarioId: number;
+    postagemId: number;
+    dataCriacao: Generated<Timestamp>;
+    dataAtualizao: Timestamp;
+    tipo: TipoVoto;
+};
 export type DB = {
     Account: Account;
     Alternativa: Alternativa;
     Area: Area;
     Area_CasoClinico: Area_CasoClinico;
+    CadernoQuestoes: CadernoQuestoes;
     CasoClinico: CasoClinico;
+    CasoClinico_SubArea: CasoClinico_SubArea;
+    Denucia: Denucia;
     PostagemForum: PostagemForum;
-    QuestaoObjetiva: QuestaoObjetiva;
-    RespostaObjetiva: RespostaObjetiva;
+    Questao: Questao;
+    Questao_CadernoQuestoes: Questao_CadernoQuestoes;
+    Questao_Simulado: Questao_Simulado;
+    Recorrecao: Recorrecao;
+    Resposta: Resposta;
     Session: Session;
+    Simulado: Simulado;
+    SubArea: SubArea;
+    Ticket: Ticket;
     User: User;
     VerificationRequest: VerificationRequest;
+    VotoPostagem: VotoPostagem;
 };

@@ -3,19 +3,14 @@ import schema from "./schema"
 import { useGraphQlJit as GraphQLJit } from "@envelop/graphql-jit"
 import { renderGraphiQL } from "@graphql-yoga/render-graphiql"
 import { useResponseCache as ResponseCache } from "@graphql-yoga/plugin-response-cache"
-import { createRedisCache } from "@envelop/response-cache-redis"
 import { useAPQ as APQ } from "@graphql-yoga/plugin-apq"
 import { useRateLimiter as RateLimiter } from "@envelop/rate-limiter"
-import Redis from "ioredis"
 import { writeFileSync } from "fs"
 import { printSchema, lexicographicSortSchema } from "graphql"
 import { initContextCache } from "@pothos/core"
 import jwt from "jsonwebtoken"
 import prisma from "@/lib/prisma"
-
-const redis = new Redis(process.env.REDIS_URL!, { enableTLSForSentinelMode: false })
-
-const cache = createRedisCache({ redis })
+import { cache, redis } from "./cache"
 
 writeFileSync("schema.gql", printSchema(lexicographicSortSchema(schema)))
 
@@ -53,6 +48,8 @@ const { handleRequest } = createYoga({
 
       currentUser = await prisma.user.findUnique({ where: { id: sub } })
     }
+
+    console.log(currentUser?.cargo)
 
     return {
       ...initContextCache(),
